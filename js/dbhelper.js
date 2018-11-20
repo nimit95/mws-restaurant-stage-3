@@ -207,6 +207,21 @@ class DBHelper {
       console.log(' Restaurant cache cleared');
     })
   }
+
+  static deleteRestaurantCacheById(id) {
+    this.openDB().then(db => {
+      if(!db) return;
+
+      let tx = db.transaction('restaurant', 'readwrite');
+      let store = tx.objectStore('restaurant');
+
+      store.delete(id);
+
+      
+    }).then(() => {
+      console.log(' Restaurant cache cleared');
+    })
+  }
   /**
    * Fetch restaurants by a cuisine type with proper error handling.
    */
