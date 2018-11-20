@@ -1,0 +1,33 @@
+@media screen and (min-width:500px) {
+  .filter-options select {
+    width: 200px
+  }
+}
+
+@media screen and (max-width:500px) {
+  #restaurant-container {
+    width: 100%;
+  }
+
+  .inside #map-container {
+    width: 100%;
+  }
+  #reviews-container, #reviews-list li {
+    width: 90%;
+  }
+}
+
+@media screen and (min-width: 500px) and (max-width:959px){
+  
+  #restaurants-list li {
+	  max-width: 40%;
+	}
+
+}
+
+@media screen and (min-width: 960px) {
+  #restaurants-list li {
+	  max-width: 30%;
+	}
+
+}
