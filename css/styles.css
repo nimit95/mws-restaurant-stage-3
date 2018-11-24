@@ -270,7 +270,7 @@ nav h1 a {
   text-align: center;
   width: 100%;
 }
-#restaurant-container, #reviews-container {
+#restaurant-container, #reviews-container, #add-reviews-container, #formResult {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
   /* padding: 140px 40px 30px; */
@@ -279,8 +279,11 @@ nav h1 a {
   width: 50%;
   display: inline-block;
 }
-#reviews-container {
+#reviews-container, #add-reviews-container, #formResult {
   padding: 30px 40px 80px;
+}
+#formResult {
+  display: none;
 }
 #reviews-container h2 {
   color: #f58500;

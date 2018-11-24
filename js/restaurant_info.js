@@ -6,6 +6,7 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
+  document.getElementById("submitReview").onclick = reviewSubmit;
 });
 var myLazyLoad = new LazyLoad({
   elements_selector: ".lazy"
@@ -19,7 +20,7 @@ checkAndMarkFavToggle = (restaurant) => {
 
 changeFavState = (toggle) => { 
   console.log(toggle.checked);
-  postData(`http://localhost:1337/restaurants/${self.restaurant.id}/?is_favorite=${toggle.checked}`, {})
+  DBHelper.setRestaurantFavById(self.restaurant.id, toggle.checked)
   .then(data => {
     console.log(JSON.stringify(data))
     DBHelper.deleteRestaurantCacheById(self.restaurant.id);
@@ -27,23 +28,7 @@ changeFavState = (toggle) => {
   .catch(error => console.error(error));
 }
 
-function postData(url = ``, data = {}) {
-  // Default options are marked with *
-    return fetch(url, {
-        method: "POST", // *GET, POST, PUT, DELETE, etc.
-        mode: "cors", // no-cors, cors, *same-origin
-        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: "same-origin", // include, *same-origin, omit
-        headers: {
-            "Content-Type": "application/json; charset=utf-8",
-            // "Content-Type": "application/x-www-form-urlencoded",
-        },
-        redirect: "follow", // manual, *follow, error
-        referrer: "no-referrer", // no-referrer, *client
-        body: JSON.stringify(data), // body data type must match "Content-Type" header
-    })
-    .then(response => response.json()); // parses response to JSON
-}
+
 /**
  * Initialize leaflet map
  */
@@ -107,9 +92,15 @@ fetchRestaurantFromURL = (callback) => {
         console.error(error);
         return;
       }
-      fillRestaurantHTML();
-      myLazyLoad.update();
-      callback(null, restaurant)
+
+      DBHelper.fetchReviewsById(id).then(reviews => {
+        console.log(reviews);
+        self.restaurant.reviews = reviews;
+        fillRestaurantHTML();
+        myLazyLoad.update();
+        callback(null, restaurant)
+      })
+      
     });
   }
 }
@@ -204,9 +195,9 @@ createReviewHTML = (review) => {
   name.innerHTML = review.name;
   li.appendChild(name);
 
-  const date = document.createElement('p');
-  date.innerHTML = review.date;
-  li.appendChild(date);
+  // const date = document.createElement('p');
+  // date.innerHTML = review.date;
+  // li.appendChild(date);
 
   const rating = document.createElement('p');
   rating.innerHTML = `Rating: ${review.rating}`;
@@ -217,6 +208,37 @@ createReviewHTML = (review) => {
   li.appendChild(comments);
 
   return li;
+}
+
+reviewSubmit = () => {
+
+  let name = document.getElementById("name").value;
+  let rating = document.getElementById("rating").value;
+  let comments = document.getElementById("comments").value;
+
+  if(!name || !rating || !comments || isNaN(rating)) {
+    document.getElementById('formResult').style.display = "inline";
+    return;
+  } else {
+    console.log('Submit data')
+    //document.getElementById('formResult').style.display = "none";
+
+    DBHelper.sendReview({
+      "restaurant_id": self.restaurant.id,
+      "name": name,
+      "rating": rating,
+      "comments": comments
+    }).then(response => {
+      console.log('sent, response is ' ,response);
+      //return DBHelper.fetchReviewsById(self.restaurant.id)
+    }).then(reviews => {
+      self.restaurant.reviews = reviews;
+      //fillReviewsHTML()
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
 }
 
 /**
