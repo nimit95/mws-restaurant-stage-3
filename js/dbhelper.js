@@ -171,23 +171,26 @@ class DBHelper {
   }
 
   static setRestaurantFavById(id, favState) {
-    return putData(`http://localhost:1337/restaurants/${id}/?is_favorite=${favState}`, {})
+    return DBHelper.putData(`http://localhost:1337/restaurants/${id}/?is_favorite=${favState}`, {})
   }
 
   static sendReview(data) {
-    return postData(`http://localhost:1337/reviews/`, data)
+    return DBHelper.postData(`http://localhost:1337/reviews/`, data)
   }
 
-  postData(url = ``, data = {}) {
+  static postData(url = ``, data = {}) {
     // Default options are marked with *
       return fetch(url, {
           method: "POST", // *GET, POST, PUT, DELETE, etc.
           body: JSON.stringify(data), // body data type must match "Content-Type" header
       })
-      .then(response => response.json()); // parses response to JSON
+      .then(response => {
+        console.log(response);
+        return response.json()
+      }); // parses response to JSON
   }
 
-  putData(url = ``, data = {}) {
+  static putData(url = ``, data = {}) {
     // Default options are marked with *
       return fetch(url, {
           method: "PUT", // *GET, POST, PUT, DELETE, etc.

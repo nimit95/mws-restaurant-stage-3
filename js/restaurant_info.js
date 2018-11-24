@@ -180,6 +180,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     return;
   }
   const ul = document.getElementById('reviews-list');
+  ul.innerHTML = "";
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
   });
@@ -212,6 +213,7 @@ createReviewHTML = (review) => {
 
 reviewSubmit = (e) => {
 
+  e.preventDefault();
   let name = document.getElementById("name").value;
   let rating = document.getElementById("rating").value;
   let comments = document.getElementById("comments").value;
@@ -222,7 +224,7 @@ reviewSubmit = (e) => {
   } else {
     console.log('Submit data')
     //document.getElementById('formResult').style.display = "none";
-    e.stopPropagation();
+    
     DBHelper.sendReview({
       "restaurant_id": self.restaurant.id,
       "name": name,
@@ -230,10 +232,10 @@ reviewSubmit = (e) => {
       "comments": comments
     }).then(response => {
       console.log('sent, response is ' ,response);
-      //return DBHelper.fetchReviewsById(self.restaurant.id)
+      return DBHelper.fetchReviewsById(self.restaurant.id)
     }).then(reviews => {
       self.restaurant.reviews = reviews;
-      //fillReviewsHTML()
+      fillReviewsHTML()
     }).catch(err => {
       console.log(err);
     })
