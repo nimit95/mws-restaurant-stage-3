@@ -210,7 +210,7 @@ createReviewHTML = (review) => {
   return li;
 }
 
-reviewSubmit = () => {
+reviewSubmit = (e) => {
 
   let name = document.getElementById("name").value;
   let rating = document.getElementById("rating").value;
@@ -222,7 +222,7 @@ reviewSubmit = () => {
   } else {
     console.log('Submit data')
     //document.getElementById('formResult').style.display = "none";
-
+    e.stopPropagation();
     DBHelper.sendReview({
       "restaurant_id": self.restaurant.id,
       "name": name,
