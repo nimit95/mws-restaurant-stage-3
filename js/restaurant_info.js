@@ -99,6 +99,8 @@ fetchRestaurantFromURL = (callback) => {
         fillRestaurantHTML();
         myLazyLoad.update();
         callback(null, restaurant)
+      }).catch(err => {
+        console.log(err);
       })
       
     });
@@ -231,13 +233,19 @@ reviewSubmit = (e) => {
       "rating": rating,
       "comments": comments
     }).then(response => {
+      if(!response) return null;
       console.log('sent, response is ' ,response);
       return DBHelper.fetchReviewsById(self.restaurant.id)
     }).then(reviews => {
+      if(!reviews) return null;
       self.restaurant.reviews = reviews;
       fillReviewsHTML()
-    }).catch(err => {
-      console.log(err);
+
+      
+      document.getElementById("name").value = '';
+      document.getElementById("rating").value = '';
+      document.getElementById("comments").value = '';
+      
     })
   }
 

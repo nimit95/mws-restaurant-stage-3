@@ -67,3 +67,17 @@ self.addEventListener('fetch', function(event) {
     })
   );
 });
+
+self.addEventListener('sync', function(event) {
+  if (event.tag == 'sync-comments') {
+    event.waitUntil(
+      new Promise((resolve, reject) => {
+        DBHelper.syncReviewsInDb().then(() => resolve())
+        .catch(err => {
+          console.log('error syncing', err);
+          reject();
+        })
+      })
+    );
+  }
+});

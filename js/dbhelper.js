@@ -32,6 +32,9 @@ class DBHelper {
         let store2 = upgradeDb.createObjectStore('restaurant',  {
           keyPath: 'id'
         });
+
+        let store3 = upgradeDb.createObjectStore('reviews');
+        
         store.createIndex('id', 'id');
         store2.createIndex('id', 'id');
       })
@@ -167,6 +170,8 @@ class DBHelper {
     return fetch(`http://localhost:1337/reviews/?restaurant_id=${id}`)
     .then(response => {
       return response.json()
+    }).catch(err => {
+      console.log(err);
     })
   }
 
@@ -187,7 +192,11 @@ class DBHelper {
       .then(response => {
         console.log(response);
         return response.json()
-      }); // parses response to JSON
+      }).catch(err => {
+        console.log('Some error', err);
+        DBHelper.addReviewToDb(data);
+        return null;
+      })
   }
 
   static putData(url = ``, data = {}) {
@@ -374,7 +383,7 @@ class DBHelper {
   /**
    * Map marker for a restaurant.
    */
-   static mapMarkerForRestaurant(restaurant, map) {
+  static mapMarkerForRestaurant(restaurant, map) {
     // https://leafletjs.com/reference-1.3.0.html#marker  
     const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng],
       {title: restaurant.name,
@@ -384,6 +393,44 @@ class DBHelper {
       marker.addTo(newMap);
     return marker;
   } 
+
+  static syncReviewsInDb() {
+    return this.openDB().then(db => {
+      if(!db) return;
+      
+      let tx = db.transaction('reviews', 'readwrite');
+      let store = tx.objectStore('reviews');
+
+      return store.openCursor();
+    }).then(function synRestaurant(cursor) {
+      if(!cursor) return;
+      
+      console.log('review is ', cursor.value);
+      DBHelper.sendReview(cursor.value).then(response => {
+        if(response) {
+          cursor.delete();
+        }
+        return cursor.continue().then(synRestaurant);
+      })
+      
+    }).then(() => {
+      console.log('All synced');
+      return true;
+    })
+  }
+
+  static addReviewToDb(review) {
+    this.openDB(db => {
+      if(!db) return;
+      console.log('Adding to db', review);
+      let tx = db.transaction('reviews', 'readwrite');
+      let store = tx.objectStore('reviews');
+
+      store.put(review);
+
+      return tx.complete
+    })
+  }
   /* static mapMarkerForRestaurant(restaurant, map) {
     const marker = new google.maps.Marker({
       position: restaurant.latlng,
