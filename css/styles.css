@@ -282,6 +282,22 @@ nav h1 a {
 #reviews-container, #add-reviews-container, #formResult {
   padding: 30px 40px 80px;
 }
+input, textarea, #submitReview {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 100%;
+  padding: 10px;
+}
+#submitReview{
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
 #formResult {
   display: none;
 }

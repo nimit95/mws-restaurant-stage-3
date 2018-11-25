@@ -195,7 +195,9 @@ class DBHelper {
       }).catch(err => {
         console.log('Some error', err);
         DBHelper.addReviewToDb(data);
-        return null;
+        navigator.serviceWorker.ready.then(function(swRegistration) {
+          return swRegistration.sync.register('sync-reviews');
+        });
       })
   }
 
@@ -396,8 +398,6 @@ class DBHelper {
 
   static syncReviewsInDb() {
     return this.openDB().then(db => {
-      if(!db) return;
-      
       let tx = db.transaction('reviews', 'readwrite');
       let store = tx.objectStore('reviews');
 
@@ -406,13 +406,14 @@ class DBHelper {
       if(!cursor) return;
       
       console.log('review is ', cursor.value);
-      DBHelper.sendReview(cursor.value).then(response => {
-        if(response) {
-          cursor.delete();
+      let reviewObj = cursor.value;
+      cursor.delete();
+      DBHelper.sendReview(reviewObj).then(response => {
+        if(!response) {
+         console.log('couldnt add, data lost'); 
         }
-        return cursor.continue().then(synRestaurant);
       })
-      
+      return cursor.continue().then(synRestaurant);
     }).then(() => {
       console.log('All synced');
       return true;
@@ -420,13 +421,13 @@ class DBHelper {
   }
 
   static addReviewToDb(review) {
-    this.openDB(db => {
-      if(!db) return;
+    this.openDB().then(db => {
       console.log('Adding to db', review);
       let tx = db.transaction('reviews', 'readwrite');
       let store = tx.objectStore('reviews');
-
-      store.put(review);
+      
+      let keyVal = Math.floor((Math.random() * 100) + 1);
+      store.put(review, 'review-' + keyVal);
 
       return tx.complete
     })
@@ -443,4 +444,3 @@ class DBHelper {
   } */
 
 }
-

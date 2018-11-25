@@ -1,4 +1,6 @@
 
+importScripts('js/idb.js')
+importScripts('js/dbhelper.js')
 
 let cacheName = 'restaurant-sw-v'
 self.addEventListener('install', function(event) {
@@ -56,7 +58,7 @@ self.addEventListener('fetch', function(event) {
       if(event.request && event.request.url.includes("restaurant.html")) {
         console.log('caching this rest page')
         return fetch(event.request).then(function(site_response){
-          cache.put(request, site_response.clone());
+          caches.put(request, site_response.clone());
           return site_response
         })
       } else {
@@ -69,10 +71,33 @@ self.addEventListener('fetch', function(event) {
 });
 
 self.addEventListener('sync', function(event) {
-  if (event.tag == 'sync-comments') {
+  if (event.tag == 'sync-reviews') {
+    console.log('Started syncing')
     event.waitUntil(
       new Promise((resolve, reject) => {
-        DBHelper.syncReviewsInDb().then(() => resolve())
+        idb.open('restaurant_review').then(db => {
+          let tx = db.transaction('reviews', 'readwrite');
+          let store = tx.objectStore('reviews');
+    
+          return store.openCursor();
+        }).then(function sendBacklogReview(cursor) {
+          if(!cursor) return;
+          
+          console.log('review is ', cursor.value);
+          let reviewObj = cursor.value;
+          cursor.delete();
+          DBHelper.sendReview(reviewObj).then(response => {
+            if(!response) {
+              console.log('couldnt add, data lost'); 
+            }
+          })
+          return cursor.continue().then(sendBacklogReview);
+          
+        }).then(() => {
+          console.log('All synced');
+          resolve()
+          return true;
+        })
         .catch(err => {
           console.log('error syncing', err);
           reject();

@@ -233,11 +233,11 @@ reviewSubmit = (e) => {
       "rating": rating,
       "comments": comments
     }).then(response => {
-      if(!response) return null;
+      if(!response) return;
       console.log('sent, response is ' ,response);
       return DBHelper.fetchReviewsById(self.restaurant.id)
     }).then(reviews => {
-      if(!reviews) return null;
+      if(!reviews) return;
       self.restaurant.reviews = reviews;
       fillReviewsHTML()
 

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <!-- Normalize.css for better cross-browser consistency -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+  <meta name="theme-color" content="#317EFB"/>
   <!-- Main CSS file -->
   <link rel="stylesheet" href="css/styles.css" type="text/css">
   <link rel="stylesheet" href="css/responsive.css">
@@ -39,7 +40,7 @@
       
       <p id="restaurant-address"></p>
       <label class="switch">
-        <input type="checkbox" id="markFav" onclick="changeFavState(this)">
+        <input type="checkbox" id="markFav" onclick="changeFavState(this)" aria-label="favourite" role="checkbox">
         <span class="slider round"></span>
       </label>
       <table id="restaurant-hours"></table>
@@ -61,10 +62,9 @@
 
     <section id="add-reviews-container">
       <form>
-        Name: <input type="text" id="name" placeholder="John"><br>
-        Rating: <input type="text" id="rating" placeholder="/5"><br>
-        Comments: 
-          <textarea rows="4" cols="50" id="comments">Your Comments</textarea><br>
+        <input type="text" id="name" placeholder="Name" aria-label="name" role="textbox"><br>
+        <input type="text" id="rating" placeholder="Rating out of 5" aria-label="rating" role="textbox"><br>
+        <textarea rows="4" cols="30" id="comments" placeholder="Comments" aria-label="comments" role="textbox"></textarea><br>
         <button id="submitReview">Submit</button>
       </form>
       <div id="formResult">Missing info</div>
@@ -86,6 +86,7 @@
   <!-- Main javascript file -->
   <script type="text/javascript" src="js/restaurant_info.js"></script>
   <script type="text/javascript" src="js/registerSW.js"></script>
+  <script type="text/javascript" src="sw.js"></script>
   <!-- Google Maps -->
  <!--  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_tKbW6A5pQ-eupxI56myUnHLqYCzOjKo&libraries=places&callback=initMap"></script> -->
   <!-- End scripts -->
